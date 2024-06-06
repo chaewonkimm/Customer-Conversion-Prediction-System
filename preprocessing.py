@@ -27,7 +27,8 @@ class SessionDataset(Dataset):
         adid = session_data['adid'].iloc[0]
         start_time = session_data['date_time'].iloc[0]
 
-        features = session_data[['hour', 'event_nm', 'ad_clicked_sequence', 'conversion_seconds']].to_numpy()
+        features = session_data[['hour', 'event_nm', 'ad_clicked_sequence', 'conversion_seconds', '누적_구매횟수',
+                                '누적_상품클릭횟수', '누적_검색횟수', '누적_장바구니횟수', '관심도_점수']].to_numpy()
         features = features.astype(float)
         
         earlier_sessions = self.adid_to_sessions.get(adid, [])
@@ -36,10 +37,11 @@ class SessionDataset(Dataset):
                 continue
             earlier_session_data = self.sessions[esid]
             if (start_time - earlier_session_data['date_time'].iloc[-1]).total_seconds() <= 86400:
-                earlier_features = earlier_session_data[['hour', 'event_nm', 'ad_clicked_sequence', 'conversion_seconds']].to_numpy() * 0.5
+                earlier_features = earlier_session_data[['hour', 'event_nm', 'ad_clicked_sequence', 'conversion_seconds', '누적_구매횟수',
+                                '누적_상품클릭횟수', '누적_검색횟수', '누적_장바구니횟수', '관심도_점수']].to_numpy() * 0.5
                 features = np.vstack([features, earlier_features])
 
-        target = session_data.iloc[-1]['target'] - 1
+        target = session_data.iloc[-1]['target2'] #target2 -> 구매전환율, target3 -> 이탈률
         features_tensor = torch.tensor(features, dtype=torch.float)
         target_tensor = torch.tensor(target, dtype=torch.long)
         return features_tensor, target_tensor
@@ -47,3 +49,4 @@ class SessionDataset(Dataset):
 def load_data(file_path):
     dataset = SessionDataset(file_path)
     return dataset
+

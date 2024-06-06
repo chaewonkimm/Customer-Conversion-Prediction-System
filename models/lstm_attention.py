@@ -22,3 +22,4 @@ class LSTMAttentionModel(nn.Module):
 
 def init_model(input_dim, hidden_dim, output_dim, num_layers, num_heads, dropout):
     return LSTMAttentionModel(input_dim, hidden_dim, output_dim, num_layers, num_heads, dropout)
+
